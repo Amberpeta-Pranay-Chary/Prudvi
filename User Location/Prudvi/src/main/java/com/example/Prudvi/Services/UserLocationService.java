@@ -3,6 +3,10 @@ package com.example.Prudvi.Services;
 import com.example.Prudvi.Repository.userRepository;
 import com.example.Prudvi.model.userLocation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,10 +14,21 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class UserLocationService {
+public class UserLocationService implements UserDetailsService {
     @Autowired
     userRepository userRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsername(username);
+
+    }
     public void create(userLocation userLocation) {
+        String encodedPwd=passwordEncoder.encode(userLocation.getPassword());
+        userLocation.setPassword(encodedPwd);
         userRepository.save(userLocation);
     }
 
